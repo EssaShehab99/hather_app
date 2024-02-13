@@ -18,6 +18,7 @@ dependencies:
   get_it: ^7.6.7
   equatable: ^2.0.5
   another_flushbar: ^1.12.30
+  firebase_core: ^2.25.4
 
 dev_dependencies:
   flutter_test:
@@ -26,3 +27,24 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  assets:
+    - assets/translations/
+    - assets/images/
+
+  fonts:
+    - family: IBMPlexSansCondensed
+      fonts:
+        - asset: assets/fonts/IBMPlexSansCondensed-Bold.ttf
+          weight: 700
+    - family: IBMPlexSansCondensed
+      fonts:
+        - asset: assets/fonts/IBMPlexSansCondensed-Medium.ttf
+          weight: 500
+    - family: IBMPlexSansCondensed
+      fonts:
+        - asset: assets/fonts/IBMPlexSansCondensed-Regular.ttf
+          weight: 400
+    - family: IBMPlexSansCondensed
+      fonts:
+        - asset: assets/fonts/IBMPlexSansCondensed-Light.ttf
+          weight: 200
