@@ -21,7 +21,7 @@ class AuthScreen extends StatelessWidget {
                 children: [
                   SizedBox(height: 45.h),
                   Text(
-                    'FaceSpotter',
+                    'HATHER',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Color(0xFFFFFDFD),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hather_app/src/utils/theme/color.dart';
-import 'package:hather_app/src/views/auth/auth_screen.dart';
-import 'package:hather_app/src/views/shared/app_screen.dart';
+import 'package:hather_app/src/views/auth_screen.dart';
+import 'package:hather_app/src/views/home_screen.dart';
 import 'package:hather_app/src/views/shared/button_widget.dart';
 import 'package:hather_app/src/views/shared/text_field_widget.dart';
 
@@ -45,34 +45,35 @@ class _VerifyScreenState extends State<VerifyScreen> {
             },
           ),
           SizedBox(height: 16.h),
-          TextButton(
-            onPressed: () {
-              // Implement logic to resend verification code
-            },
-            style: ButtonStyle(
-                padding: MaterialStatePropertyAll(
-                    EdgeInsets.symmetric(horizontal: 4.h)),
-                shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.h)))),
-            child: Text(
-              'Resend code',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.black.withOpacity(0.3799999952316284),
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                height: 0,
-              ),
-            ),
-          ),
+          // TextButton(
+          //   onPressed: () {
+          //     // Implement logic to resend verification code
+          //   },
+          //   style: ButtonStyle(
+          //       padding: MaterialStatePropertyAll(
+          //           EdgeInsets.symmetric(horizontal: 4.h)),
+          //       shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(10.h)))),
+          //   child: Text(
+          //     'Resend code',
+          //     textAlign: TextAlign.center,
+          //     style: TextStyle(
+          //       color: Colors.black.withOpacity(0.3799999952316284),
+          //       fontSize: 16,
+          //       fontWeight: FontWeight.w600,
+          //       height: 0,
+          //     ),
+          //   ),
+          // ),
           SizedBox(height: 16.h),
           ButtonWidget(
             text: 'Verify',
             onPressed: () {
               // Check if verification code is correct
               if (_verificationCode == '123456') {
+                FocusScope.of(context).unfocus();
                 // Navigate to the home screen if verification code is correct
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.push(context,MaterialPageRoute(builder: (context) => HomeScreen()));
               } else {
                 // Display error message or handle incorrect verification code
                 showDialog(

@@ -1,10 +1,12 @@
+import 'package:either_dart/either.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hather_app/src/controllers/c_auth.dart';
+import 'package:hather_app/src/controllers/c_user.dart';
 import 'package:hather_app/src/models/user.dart';
 import 'package:hather_app/src/utils/theme/color.dart';
-import 'package:hather_app/src/views/auth/auth_screen.dart';
-import 'package:hather_app/src/views/auth/verify_screen.dart';
+import 'package:hather_app/src/views/auth_screen.dart';
+import 'package:hather_app/src/views/verify_screen.dart';
 import 'package:hather_app/src/views/shared/button_widget.dart';
 import 'package:hather_app/src/views/shared/components.dart';
 import 'package:hather_app/src/views/shared/text_field_widget.dart';
@@ -117,17 +119,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
               text: 'Register',
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
-                  final result = await registerUser();
-                  if (result is String) {
+                  FocusScope.of(context).unfocus();
+
+                  final user = User(
+                    id: '',
+                    name: _nameController.text,
+                    email: _emailController.text,
+                    password: _passwordController.text,
+                  );
+                  final either = await CAuth.get(context).register(user);
+
+
+                  if (either.isRight) {
+                    CUser.get(context).user=(either as Right).value;
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => VerifyScreen(),
                         ));
-                  } else if (result is String) {
+                  } else if (either is Left) {
                     // Registration failed
                     setState(() {
-                      _errorMessage = result;
+                      _errorMessage = either.value;
                     });
                   } else {
                     // Handle unexpected result
@@ -187,24 +200,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
-  }
-
-  Future<dynamic> registerUser() async {
-    try {
-      final user = User(
-        id: '',
-        name: _nameController.text,
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      final result = await CAuth.get(context).register(user);
-      return result.fold(
-            (failure) => failure,
-            (success) => success,
-      );
-    } catch (e) {
-      return 'An error occurred during registration';
-    }
   }
 
   bool isValidEmail(String email) {

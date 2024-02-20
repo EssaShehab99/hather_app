@@ -60,7 +60,7 @@ class SAuth {
       // Save user data locally
       await _saveUserDataLocally(user);
 
-      return Right('Registration successful');
+      return Right(user);
     } catch (e) {
       return Left('Error: $e');
     }
@@ -84,4 +84,6 @@ class SAuth {
       return null;
     }
   }
+
+  void logout() =>_preferences.delete('user');
 }

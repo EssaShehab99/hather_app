@@ -1,12 +1,14 @@
+import 'package:either_dart/either.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hather_app/src/controllers/c_auth.dart';
+import 'package:hather_app/src/controllers/c_user.dart';
 import 'package:hather_app/src/utils/theme/color.dart';
-import 'package:hather_app/src/views/auth/auth_screen.dart';
-import 'package:hather_app/src/views/auth/home_screen.dart';
-import 'package:hather_app/src/views/auth/register_screen.dart';
-import 'package:hather_app/src/views/auth/verify_screen.dart';
+import 'package:hather_app/src/views/auth_screen.dart';
+import 'package:hather_app/src/views/home_screen.dart';
+import 'package:hather_app/src/views/register_screen.dart';
+import 'package:hather_app/src/views/verify_screen.dart';
 import 'package:hather_app/src/views/shared/button_widget.dart';
 import 'package:hather_app/src/views/shared/components.dart';
 import 'package:hather_app/src/views/shared/text_field_widget.dart';
@@ -51,9 +53,16 @@ class _LoginScreenState extends State<LoginScreen> {
               labelText: 'Email',
               placeHolder: 'ex: test@gmail.com',
               keyboardType: TextInputType.emailAddress,
-              validator: (value) => value == null || value.isEmpty == true
-                  ? "This field is required"
-                  : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
+                if (!isValidEmail(value)) {
+                  return 'Please enter a valid email';
+                }
+                return null;
+              },
+
             ),
             SizedBox(height: 16.h),
             TextFieldWidget(
@@ -65,29 +74,30 @@ class _LoginScreenState extends State<LoginScreen> {
                   : null,
             ),
             SizedBox(height: 16.h),
-            TextButton(
-              onPressed: () {},
-              style: ButtonStyle(
-                  padding: MaterialStatePropertyAll(
-                      EdgeInsets.symmetric(horizontal: 4.h)),
-                  shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.h)))),
-              child: Text(
-                'forget Password',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black.withOpacity(0.3799999952316284),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  height: 0,
-                ),
-              ),
-            ),
+            // TextButton(
+            //   onPressed: () {},
+            //   style: ButtonStyle(
+            //       padding: MaterialStatePropertyAll(
+            //           EdgeInsets.symmetric(horizontal: 4.h)),
+            //       shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(10.h)))),
+            //   child: Text(
+            //     'forget Password',
+            //     textAlign: TextAlign.center,
+            //     style: TextStyle(
+            //       color: Colors.black.withOpacity(0.3799999952316284),
+            //       fontSize: 16,
+            //       fontWeight: FontWeight.w600,
+            //       height: 0,
+            //     ),
+            //   ),
+            // ),
             SizedBox(height: 16.h),
             ButtonWidget(
               text: 'Log in',
               onPressed: () async {
                 if (!_formKey.currentState!.validate()) return;
+                FocusScope.of(context).unfocus();
                 final either =
                     await CAuth.get(context).login(email.text, password.text);
                 if (!mounted) return;
@@ -95,6 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   showToast(context,
                       "This user does not exist, please check the data");
                 } else {
+                  CUser.get(context).user=(either as Right).value;
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -156,5 +167,10 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+  bool isValidEmail(String email) {
+    // You can implement more robust email validation if needed
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegex.hasMatch(email);
   }
 }

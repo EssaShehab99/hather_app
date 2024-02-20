@@ -6,10 +6,10 @@ import 'package:hather_app/src/controllers/c_auth.dart';
 import 'package:hather_app/src/controllers/c_home.dart';
 import 'package:hather_app/src/controllers/c_user.dart';
 import 'package:hather_app/src/utils/di/services_locator.dart';
-import 'package:hather_app/src/views/auth/home_screen.dart';
-import 'package:hather_app/src/views/auth/login_screen.dart';
-import 'package:hather_app/src/views/auth/register_screen.dart';
-import 'package:hather_app/src/views/auth/verify_screen.dart';
+import 'package:hather_app/src/views/home_screen.dart';
+import 'package:hather_app/src/views/login_screen.dart';
+import 'package:hather_app/src/views/register_screen.dart';
+import 'package:hather_app/src/views/verify_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
             locale: context.locale,
             theme: ThemeData(fontFamily: 'IBMPlexSansCondensed',scaffoldBackgroundColor: Colors.white),
             title: 'ArtX',
-            home: user==null?LoginScreen():HomeScreen(),
+            home: HomeScreen(),
           );
         },
       ),

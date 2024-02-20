@@ -14,9 +14,16 @@ class CUser extends ChangeNotifier{
 
   set user(User? value) {
     _user = value;
+    notifyListeners();
+  }
+  void logout() {
+    sAuth.logout();
+    user=null;
+    notifyListeners();
   }
 
   void initial() {
     _user = sAuth.getUserData();
+    notifyListeners();
   }
 }
