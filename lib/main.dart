@@ -2,16 +2,24 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hather_app/src/controllers/c_auth.dart';
+import 'package:hather_app/src/controllers/c_home.dart';
 import 'package:hather_app/src/controllers/c_user.dart';
 import 'package:hather_app/src/utils/di/services_locator.dart';
+import 'package:hather_app/src/views/auth/home_screen.dart';
 import 'package:hather_app/src/views/auth/login_screen.dart';
 import 'package:hather_app/src/views/auth/register_screen.dart';
 import 'package:hather_app/src/views/auth/verify_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
+// ...
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   setup();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -48,22 +56,23 @@ class MyApp extends StatelessWidget {
       designSize: const Size(428, 926),
       builder: (context, child) => MultiProvider(
         providers: [
-          ChangeNotifierProvider<CUser>(create: (context) => CUser()..initial()),
+          ChangeNotifierProvider<CUser>(
+              create: (context) => CUser()..initial()),
+          ChangeNotifierProvider<CAuth>(
+              create: (context) => CAuth()),
+          ChangeNotifierProvider<CHome>(
+              create: (context) => CHome()),
         ],
         builder: (context, _) {
-          final user=CUser.get(context).user;
-          return FutureBuilder(
-            future: Firebase.initializeApp(),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) =>
-                MaterialApp(
-                  debugShowCheckedModeBanner: false,
-                  localizationsDelegates: context.localizationDelegates,
-                  supportedLocales: context.supportedLocales,
-                  locale: context.locale,
-                  theme: ThemeData(fontFamily: 'IBMPlexSansCondensed'),
-                  title: 'ArtX',
-                  home: VerifyScreen(),
-                ),
+          final user = CUser.get(context).user;
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            theme: ThemeData(fontFamily: 'IBMPlexSansCondensed',scaffoldBackgroundColor: Colors.white),
+            title: 'ArtX',
+            home: user==null?LoginScreen():HomeScreen(),
           );
         },
       ),

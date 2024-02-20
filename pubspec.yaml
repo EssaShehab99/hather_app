@@ -19,7 +19,9 @@ dependencies:
   equatable: ^2.0.5
   another_flushbar: ^1.12.30
   firebase_core: ^2.25.4
-
+  cloud_firestore: ^4.15.5
+  camera: ^0.10.5+9
+  dio: ^5.4.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

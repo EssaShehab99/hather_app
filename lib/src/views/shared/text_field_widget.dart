@@ -83,6 +83,7 @@ class TextFieldWidget extends StatelessWidget {
           textAlign: textAlign ?? TextAlign.start,
           style: Theme.of(context).textTheme.bodyText2,
           decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(horizontal: 10.h),
               enabledBorder: OutlineInputBorder(
                 borderRadius:
                     BorderRadius.circular(10.h),
@@ -118,7 +119,7 @@ class TextFieldWidget extends StatelessWidget {
               hintText: placeHolder,
               hintStyle:  TextStyle(
                 color: Color(0xFFD1D1D1),
-                fontSize: 16,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
                 height: 0,
               ),

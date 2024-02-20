@@ -7,13 +7,15 @@ import 'package:hather_app/src/views/shared/button_widget.dart';
 import 'package:hather_app/src/views/shared/text_field_widget.dart';
 
 class VerifyScreen extends StatefulWidget {
-  const VerifyScreen({super.key});
+  const VerifyScreen({Key? key}) : super(key: key);
 
   @override
   State<VerifyScreen> createState() => _VerifyScreenState();
 }
 
 class _VerifyScreenState extends State<VerifyScreen> {
+  String _verificationCode = '';
+
   @override
   Widget build(BuildContext context) {
     return AuthScreen(
@@ -38,10 +40,15 @@ class _VerifyScreenState extends State<VerifyScreen> {
           TextFieldWidget(
             labelText: 'Code',
             placeHolder: 'ex: 12345',
+            onChanged: (value) {
+              _verificationCode = value;
+            },
           ),
           SizedBox(height: 16.h),
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              // Implement logic to resend verification code
+            },
             style: ButtonStyle(
                 padding: MaterialStatePropertyAll(
                     EdgeInsets.symmetric(horizontal: 4.h)),
@@ -61,7 +68,30 @@ class _VerifyScreenState extends State<VerifyScreen> {
           SizedBox(height: 16.h),
           ButtonWidget(
             text: 'Verify',
-            onPressed: () {},
+            onPressed: () {
+              // Check if verification code is correct
+              if (_verificationCode == '123456') {
+                // Navigate to the home screen if verification code is correct
+                Navigator.pushReplacementNamed(context, '/home');
+              } else {
+                // Display error message or handle incorrect verification code
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Invalid Code'),
+                    content: Text('The verification code entered is incorrect.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Close the dialog
+                        },
+                        child: Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+            },
           ),
           SizedBox(height: 100.h),
           Text(
