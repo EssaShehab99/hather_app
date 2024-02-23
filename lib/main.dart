@@ -72,7 +72,7 @@ class MyApp extends StatelessWidget {
             locale: context.locale,
             theme: ThemeData(fontFamily: 'IBMPlexSansCondensed',scaffoldBackgroundColor: Colors.white),
             title: 'ArtX',
-            home: HomeScreen(),
+            home:user==null?LoginScreen(): HomeScreen(),
           );
         },
       ),

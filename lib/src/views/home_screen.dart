@@ -120,15 +120,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Align(
                         alignment: AlignmentDirectional.bottomCenter,
                         child: TextButton(
-                          onPressed: () => value.user != null
-                              ? value.logout()
-                              : Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginScreen(),
-                                  )),
+                          onPressed: () {
+                            value.logout();
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LoginScreen(),
+                                ));
+                          },
                           child: Text(
-                            CUser.get(context).user != null ? "Logout" : 'Login',
+                            CUser.get(context).user != null
+                                ? "Logout"
+                                : 'Login',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
@@ -204,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: EdgeInsets.all(20.h),
               child: ButtonWidget(
-                text: isCamera?'Stop track ':'Start track ',
+                text: isCamera ? 'Stop track ' : 'Start track ',
                 onPressed: () => setState(() => isCamera = !isCamera),
               ),
             )
