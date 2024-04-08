@@ -6,7 +6,7 @@ class DioClient {
   final Dio _dio;
 
   DioClient(this._dio) {
-    _dio..options.baseUrl = "http://13.49.73.92:8001/api";
+    _dio..options.baseUrl = "http://138.197.118.133/";
 
     // Add interceptors
     _dio.interceptors.add(

@@ -11,13 +11,18 @@ class CHome extends ChangeNotifier {
       Provider.of<CHome>(context, listen: false);
   final _sHome = getIt<SHome>();
 
-  Future<Either> uploadImage(String imagePath) async {
+  Future<String> uploadImage(String imagePath) async {
     try {
       // Call the register method from SAuth service
       final result = await _sHome.uploadImage(imagePath);
-      return result;
+      if (result.isRight) {
+        //get message from result
+        final message = result.fold((l) => l, (r) => r['Message']);
+        return message;
+      }
+      return result.fold((l) => l, (r) => r);
     } catch (e) {
-      return Left('Error: $e');
+      return e.toString();
     }
   }
 }

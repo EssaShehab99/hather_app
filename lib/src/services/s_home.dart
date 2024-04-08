@@ -19,7 +19,7 @@ class SHome {
     });
 
     // Send POST request with FormData
-    Either either = await _dioClient.post("predict/", data: formData);
+    final either = await _dioClient.post("create", data: formData);
 
     return either;
   }

@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hather_app/src/controllers/c_user.dart';
@@ -32,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _initializeCamera();
 
     // Start timer to take picture every 10 seconds
-    _timer = Timer.periodic(Duration(seconds: 10), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 15), (timer) {
       if (isCamera) {
         _takePictureAndUpload();
       }
@@ -81,11 +83,60 @@ class _HomeScreenState extends State<HomeScreen> {
       // Ensure the camera controller is initialized and capturing
       if (_controller != null && _controller!.value.isInitialized) {
         // Construct a path for the image to be saved
-        final imagePath = 'path/to/image.jpeg';
+        const imagePath = 'path/to/image.jpeg';
         // Take picture and save to the specified path
         final file = await _controller!.takePicture();
         // Upload the image
-        await CHome.get(context).uploadImage(file.path);
+        if (!mounted) return;
+        final message = await CHome.get(context).uploadImage(file.path);
+        if (!mounted) return;
+        showDialog(
+            context: context,
+            builder: (context) {
+              //pop up dialog after 3 seconds
+              Future.delayed(Duration(seconds: 2), () {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              });
+              return Material(
+                color: Colors.transparent,
+                child: Column(
+                  children: [
+                    Stack(
+                      alignment: Alignment.topCenter,
+                      children: [
+                        Container(
+                          height: 150.h,
+                          padding: EdgeInsets.all(20.h),
+                          alignment: Alignment.bottomCenter,
+                          margin: EdgeInsets.all(20.h),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondaryColor,
+                            borderRadius: BorderRadius.circular(20.h),
+                          ),
+                          child: Text(
+                            message,
+                            style:const TextStyle(
+                              color: Color(0xFF6173D2),
+                              fontSize: 15,
+                              fontFamily: 'IBM Plex Sans Condensed',
+                              fontWeight: FontWeight.w600,
+                              height: 0,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: SvgPicture.asset(
+                                "assets/images/notification.svg"))
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            });
       }
     } catch (e) {
       print('Error taking picture and uploading: $e');
@@ -181,7 +232,14 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: isCamera &&
                       (_controller != null && _controller!.value.isInitialized)
-                  ? CameraPreview(_controller!)
+                  ? Center(
+                    child: SizedBox(
+                      height: 500.h,
+                      child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14.r),
+                      child: CameraPreview(_controller!)),
+                    ),
+                  )
                   : SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -208,7 +266,9 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.all(20.h),
               child: ButtonWidget(
                 text: isCamera ? 'Stop track ' : 'Start track ',
-                onPressed: () => setState(() => isCamera = !isCamera),
+                onPressed: () {
+                  setState(() => isCamera = !isCamera);
+                },
               ),
             )
           ],
