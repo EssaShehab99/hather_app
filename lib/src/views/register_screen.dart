@@ -6,6 +6,7 @@ import 'package:hather_app/src/controllers/c_user.dart';
 import 'package:hather_app/src/models/user.dart';
 import 'package:hather_app/src/utils/theme/color.dart';
 import 'package:hather_app/src/views/auth_screen.dart';
+import 'package:hather_app/src/views/home_screen.dart';
 import 'package:hather_app/src/views/verify_screen.dart';
 import 'package:hather_app/src/views/shared/button_widget.dart';
 import 'package:hather_app/src/views/shared/components.dart';
@@ -132,11 +133,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                   if (either.isRight) {
                     CUser.get(context).user=(either as Right).value;
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VerifyScreen(),
-                        ));
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => HomeScreen()));
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => VerifyScreen(),
+                    //     ));
                   } else if (either is Left) {
                     // Registration failed
                     setState(() {
