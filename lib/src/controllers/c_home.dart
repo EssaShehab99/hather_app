@@ -1,5 +1,6 @@
 import 'package:either_dart/either.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hather_app/src/models/message.dart';
 import 'package:hather_app/src/models/user.dart';
 import 'package:hather_app/src/services/s_auth.dart';
 import 'package:hather_app/src/services/s_home.dart';
@@ -11,18 +12,16 @@ class CHome extends ChangeNotifier {
       Provider.of<CHome>(context, listen: false);
   final _sHome = getIt<SHome>();
 
-  Future<String> uploadImage(String imagePath) async {
+  Future<Message?> uploadImage(String imagePath) async {
     try {
-      // Call the register method from SAuth service
       final result = await _sHome.uploadImage(imagePath);
       if (result.isRight) {
-        //get message from result
-        final message = result.fold((l) => l, (r) => r['Message']);
+        final message = Message.fromMap((result as Right).value);
         return message;
       }
-      return result.fold((l) => l, (r) => r);
+      return null;
     } catch (e) {
-      return e.toString();
+      return null;
     }
   }
 }

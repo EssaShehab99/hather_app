@@ -4,6 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hather_app/src/controllers/c_user.dart';
@@ -12,6 +13,7 @@ import 'package:hather_app/src/views/login_screen.dart';
 import 'package:hather_app/src/views/shared/button_widget.dart';
 import 'package:hather_app/src/controllers/c_home.dart';
 import 'package:hather_app/src/controllers/c_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -34,9 +36,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _initializeCamera();
 
     // Start timer to take picture every 10 seconds
-    _timer = Timer.periodic(Duration(seconds: 15), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 30), (timer) {
       if (isCamera) {
-        _takePictureAndUpload();
+        _controller!.takePicture().then((file) {
+          _takePictureAndUpload(file);
+        });
       }
     });
   }
@@ -69,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isCapturing = false;
 
-  Future<void> _takePictureAndUpload() async {
+  Future<void> _takePictureAndUpload(XFile file) async {
     // Check if a capture operation is already in progress
     if (_isCapturing) {
       print('Capture operation already in progress.');
@@ -83,60 +87,70 @@ class _HomeScreenState extends State<HomeScreen> {
       // Ensure the camera controller is initialized and capturing
       if (_controller != null && _controller!.value.isInitialized) {
         // Construct a path for the image to be saved
-        const imagePath = 'path/to/image.jpeg';
-        // Take picture and save to the specified path
-        final file = await _controller!.takePicture();
         // Upload the image
         if (!mounted) return;
         final message = await CHome.get(context).uploadImage(file.path);
         if (!mounted) return;
-        showDialog(
-            context: context,
-            builder: (context) {
-              //pop up dialog after 3 seconds
-              Future.delayed(Duration(seconds: 2), () {
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              });
-              return Material(
-                color: Colors.transparent,
-                child: Column(
-                  children: [
-                    Stack(
-                      alignment: Alignment.topCenter,
-                      children: [
-                        Container(
-                          height: 150.h,
-                          padding: EdgeInsets.all(20.h),
-                          alignment: Alignment.bottomCenter,
-                          margin: EdgeInsets.all(20.h),
-                          decoration: BoxDecoration(
-                            color: AppColors.secondaryColor,
-                            borderRadius: BorderRadius.circular(20.h),
-                          ),
-                          child: Text(
-                            message,
-                            style:const TextStyle(
-                              color: Color(0xFF6173D2),
-                              fontSize: 15,
-                              fontFamily: 'IBM Plex Sans Condensed',
-                              fontWeight: FontWeight.w600,
-                              height: 0,
+        if (message?.message.isNotEmpty == true) {
+          if (message?.status == 2) {
+            FlutterRingtonePlayer().play(
+                fromAsset: "assets/emergency.wav",
+                // will be the sound on Android
+                ios: IosSounds.glass // will be the sound on iOS
+                );
+          }
+
+          showDialog(
+              context: context,
+              builder: (context) {
+                //pop up dialog after 3 seconds
+                Future.delayed(const Duration(seconds: 6), () {
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    FlutterRingtonePlayer().stop();
+                  }
+                });
+                return Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    children: [
+                      Stack(
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            height: 150.h,
+                            padding: EdgeInsets.all(20.h),
+                            alignment: Alignment.bottomCenter,
+                            margin: EdgeInsets.all(20.h),
+                            decoration: BoxDecoration(
+                              color: message?.status == 2
+                                  ? Colors.red
+                                  : AppColors.secondaryColor,
+                              borderRadius: BorderRadius.circular(20.h),
                             ),
-                            textAlign: TextAlign.center,
+                            child: Text(
+                              message!.message,
+                              style: const TextStyle(
+                                color: Color(0xFF6173D2),
+                                fontSize: 15,
+                                fontFamily: 'IBM Plex Sans Condensed',
+                                fontWeight: FontWeight.w600,
+                                height: 0,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
-                        CircleAvatar(
-                            backgroundColor: Colors.white,
-                            child: SvgPicture.asset(
-                                "assets/images/notification.svg"))
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            });
+                          CircleAvatar(
+                              backgroundColor: Colors.white,
+                              child: SvgPicture.asset(
+                                  "assets/images/notification.svg"))
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              });
+        }
       }
     } catch (e) {
       print('Error taking picture and uploading: $e');
@@ -233,13 +247,13 @@ class _HomeScreenState extends State<HomeScreen> {
               child: isCamera &&
                       (_controller != null && _controller!.value.isInitialized)
                   ? Center(
-                    child: SizedBox(
-                      height: 500.h,
-                      child: ClipRRect(
-                      borderRadius: BorderRadius.circular(14.r),
-                      child: CameraPreview(_controller!)),
-                    ),
-                  )
+                      child: SizedBox(
+                        height: 500.h,
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14.r),
+                            child: CameraPreview(_controller!)),
+                      ),
+                    )
                   : SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -264,11 +278,35 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Padding(
               padding: EdgeInsets.all(20.h),
-              child: ButtonWidget(
-                text: isCamera ? 'Stop track ' : 'Start track ',
-                onPressed: () {
-                  setState(() => isCamera = !isCamera);
-                },
+              child: Row(
+                children: [
+                  if (!isCamera) ...[
+                    Expanded(
+                      child: ButtonWidget(
+                        text: 'Upload image ',
+                        onPressed: () {
+                          final picker = ImagePicker();
+                          picker
+                              .pickImage(source: ImageSource.gallery)
+                              .then((file) {
+                            if (file != null) {
+                              _takePictureAndUpload(file);
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 20.h),
+                  ],
+                  Expanded(
+                    child: ButtonWidget(
+                      text: isCamera ? 'Stop track ' : 'Start track ',
+                      onPressed: () {
+                        setState(() => isCamera = !isCamera);
+                      },
+                    ),
+                  ),
+                ],
               ),
             )
           ],
