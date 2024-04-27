@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   CameraController? _controller;
   List<CameraDescription>? cameras;
   late Timer _timer;
+  XFile? file;
 
   @override
   void initState() {
@@ -198,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ? "Logout"
                                 : 'Login',
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontFamily: 'IBM Plex Sans Condensed',
@@ -211,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    Expanded(
+                    const Expanded(
                       child: Align(
                         alignment: AlignmentDirectional.bottomCenter,
                         child: Text(
@@ -259,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           SizedBox(height: 53.h),
-                          Text(
+                          const Text(
                             'Make your face attention \nto the camera!',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -271,6 +273,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           SizedBox(height: 35.h),
+                          if( file!=null)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(20.r),
+                            child: Image.file(
+                              File(file!.path) ,
+                              height: 400.h,
+                              width: 400.h,
+                              fit: BoxFit.cover,
+                            ),
+                          )else
                           SvgPicture.asset("assets/images/image.svg"),
                         ],
                       ),
@@ -285,10 +297,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: ButtonWidget(
                         text: 'Upload image ',
                         onPressed: () {
+                          file = null;
                           final picker = ImagePicker();
                           picker
                               .pickImage(source: ImageSource.gallery)
                               .then((file) {
+                            setState(() {
+                              this.file= file;
+                            });
                             if (file != null) {
                               _takePictureAndUpload(file);
                             }
@@ -302,6 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: ButtonWidget(
                       text: isCamera ? 'Stop track ' : 'Start track ',
                       onPressed: () {
+                        file = null;
                         setState(() => isCamera = !isCamera);
                       },
                     ),
