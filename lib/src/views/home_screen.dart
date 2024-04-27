@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hather_app/src/controllers/c_user.dart';
 import 'package:hather_app/src/utils/theme/color.dart';
+import 'package:hather_app/src/views/dialog_widget.dart';
 import 'package:hather_app/src/views/login_screen.dart';
 import 'package:hather_app/src/views/shared/button_widget.dart';
 import 'package:hather_app/src/controllers/c_home.dart';
@@ -41,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _timer = Timer.periodic(Duration(seconds: 30), (timer) {
       if (isCamera) {
         _controller!.takePicture().then((file) {
-          _takePictureAndUpload(file);
+          _uploadPicture(file);
         });
       }
     });
@@ -75,10 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isCapturing = false;
 
-  Future<void> _takePictureAndUpload(XFile file) async {
+  Future<void> _uploadPicture(XFile file) async {
     // Check if a capture operation is already in progress
     if (_isCapturing) {
-      print('Capture operation already in progress.');
       return;
     }
 
@@ -101,7 +101,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ios: IosSounds.glass // will be the sound on iOS
                 );
           }
-
           showDialog(
               context: context,
               builder: (context) {
@@ -112,52 +111,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     FlutterRingtonePlayer().stop();
                   }
                 });
-                return Material(
-                  color: Colors.transparent,
-                  child: Column(
-                    children: [
-                      Stack(
-                        alignment: Alignment.topCenter,
-                        children: [
-                          Container(
-                            height: 150.h,
-                            padding: EdgeInsets.all(20.h),
-                            alignment: Alignment.bottomCenter,
-                            margin: EdgeInsets.all(20.h),
-                            decoration: BoxDecoration(
-                              color: message?.status == 2
-                                  ? Colors.red
-                                  : AppColors.secondaryColor,
-                              borderRadius: BorderRadius.circular(20.h),
-                            ),
-                            child: Text(
-                              message!.message,
-                              style: const TextStyle(
-                                color: Color(0xFF6173D2),
-                                fontSize: 15,
-                                fontFamily: 'IBM Plex Sans Condensed',
-                                fontWeight: FontWeight.w600,
-                                height: 0,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          CircleAvatar(
-                              backgroundColor: Colors.white,
-                              child: SvgPicture.asset(
-                                  "assets/images/notification.svg"))
-                        ],
-                      ),
-                    ],
-                  ),
-                );
+                return DialogWidget(message: message);
               });
         }
       }
-    } catch (e) {
-      print('Error taking picture and uploading: $e');
     } finally {
-      // Reset the flag to indicate that the capture operation has completed
       _isCapturing = false;
     }
   }
@@ -273,17 +231,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           SizedBox(height: 35.h),
-                          if( file!=null)
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(20.r),
-                            child: Image.file(
-                              File(file!.path) ,
-                              height: 400.h,
-                              width: 400.h,
-                              fit: BoxFit.cover,
-                            ),
-                          )else
-                          SvgPicture.asset("assets/images/image.svg"),
+                          if (file != null)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20.r),
+                              child: Image.file(
+                                File(file!.path),
+                                height: 400.h,
+                                width: 400.h,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          else
+                            SvgPicture.asset("assets/images/image.svg"),
                         ],
                       ),
                     ), // Show camera preview if initialized
@@ -303,10 +262,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               .pickImage(source: ImageSource.gallery)
                               .then((file) {
                             setState(() {
-                              this.file= file;
+                              this.file = file;
                             });
                             if (file != null) {
-                              _takePictureAndUpload(file);
+                              _uploadPicture(file);
                             }
                           });
                         },
